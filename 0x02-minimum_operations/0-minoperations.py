@@ -9,6 +9,8 @@ def minOperations(n):
     h = 'H'
     final = 'H'
     op = 0
+    if n <= 1:
+        return 0
     while(len(final) < n):
         if n % len(final) == 0:
             op += 2
