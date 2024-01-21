@@ -6,7 +6,7 @@
 def minOperations(n):
     '''returns nb of ops if impossible => 0'''
 
-    hif n < 2:
+    if n < 2:
         return 0
     factor_list = []
     i = 1
