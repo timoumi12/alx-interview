@@ -6,19 +6,14 @@
 def minOperations(n):
     '''returns nb of ops if impossible => 0'''
 
-    h = 'H'
-    final = 'H'
-    op = 0
-    if n <= 1:
+    hif n < 2:
         return 0
-    while(len(final) < n):
-        if n % len(final) == 0:
-            op += 2
-            h = final
-            final += final
-        else:
-            op += 1
-            final += h
-    if len(final) != n:
-        return 0
-    return op
+    factor_list = []
+    i = 1
+    while n != 1:
+        i += 1
+        if n % i == 0:
+            while n % i == 0:
+                n /= i
+                factor_list.append(i)
+    return sum(factor_list)
