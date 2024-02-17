@@ -1,77 +1,125 @@
-"""The n queens puzzle."""
-class NQueens:
-    """Generate all valid solutions for the n queens puzzle"""
-    def __init__(self, size):
-        # Store the puzzle (problem) size and the number of valid solutions
-        self.size = size
-        self.solutions = 0
-        self.solve()
-
-    def solve(self):
-        """Solve the n queens puzzle and print the number of solutions"""
-        positions = [-1] * self.size
-        self.put_queen(positions, 0)
-        print("Found", self.solutions, "solutions.")
-
-    def put_queen(self, positions, target_row):
-        """
-        Try to place a queen on target_row by checking all N possible cases.
-        If a valid place is found the function calls itself trying to place a queen
-        on the next row until all N queens are placed on the NxN board.
-        """
-        # Base (stop) case - all N rows are occupied
-        if target_row == self.size:
-            self.show_full_board(positions)
-            # self.show_short_board(positions)
-            self.solutions += 1
-        else:
-            # For all N columns positions try to place a queen
-            for column in range(self.size):
-                # Reject all invalid positions
-                if self.check_place(positions, target_row, column):
-                    positions[target_row] = column
-                    self.put_queen(positions, target_row + 1)
+#!/usr/bin/python3
+""" A program that solves the N queens problem
+"""
+from sys import argv
 
 
-    def check_place(self, positions, ocuppied_rows, column):
-        """
-        Check if a given position is under attack from any of
-        the previously placed queens (check column and diagonal positions)
-        """
-        for i in range(ocuppied_rows):
-            if positions[i] == column or \
-                positions[i] - i == column - ocuppied_rows or \
-                positions[i] + i == column + ocuppied_rows:
+def check_row(board, index, board_len):
+    """ Check if there is a queen in the row """
+    for r in range(board_len):
+        if board[index][r]:
+            return (False)
 
-                return False
-        return True
+    return (True)
 
-    def show_full_board(self, positions):
-        """Show the full NxN board"""
-        for row in range(self.size):
-            line = ""
-            for column in range(self.size):
-                if positions[row] == column:
-                    line += "Q "
-                else:
-                    line += ". "
-            print(line)
-        print("\n")
 
-    def show_short_board(self, positions):
-        """
-        Show the queens positions on the board in compressed form,
-        each number represent the occupied column position in the corresponding row.
-        """
-        line = ""
-        for i in range(self.size):
-            line += str(positions[i]) + " "
-        print(line)
+def check_r_angle(board, row, col, board_len):
+    """ Check if there is a queen in the left angle """
+    c = col
+    for r in range(row, -1, -1):
+        if c >= board_len:
+            break
+        if board[r][c]:
+            return (False)
+        c += 1
+
+    c = col
+    for r in range(row, board_len):
+        if c < 0:
+            break
+        if board[r][c]:
+            return (False)
+        c -= 1
+
+    return (True)
+
+
+def check_l_angle(board, row, col, board_len):
+    """ Check if there is a queen in the right angle """
+    c = col
+    for r in range(row, -1, -1):
+        if c < 0:
+            break
+        if board[r][c]:
+            return (False)
+        c -= 1
+
+    c = col
+    for r in range(row, board_len):
+        if c >= board_len:
+            break
+        if board[r][c]:
+            return (False)
+        c += 1
+
+    return (True)
+
+
+def chek_all(board, r, c, n):
+    if not check_row(board, r, n):
+        return (False)
+
+    if not check_l_angle(board, r, c, n):
+        return (False)
+
+    return (check_r_angle(board, r, c, n))
+
 
 def main():
-    """Initialize and solve the n queens puzzle"""
-    NQueens(8)
+    """ The Main Function """
+
+    argc = len(argv)
+    if argc != 2:
+        print("Usage: nqueens N")
+        exit(1)
+
+    try:
+        n = int(argv[1])
+    except Exception:
+        print("N must be a number")
+        exit(1)
+
+    if n < 4:
+        print("N must be at least 4")
+        exit(1)
+
+    n_range = range(n)
+    i = 0
+    c = 0
+    r = i
+    board = [[0 for _ in n_range] for _ in n_range]
+    result = []
+    while i < n:
+        while (c < n):
+            found = 0
+
+            while (r < n):
+                if chek_all(board, r, c, n):
+                    board[r][c] = 1
+                    result.append([c, r])
+                    found = 1
+                    r = 0
+                    break
+                r += 1
+
+            if not found and len(result):
+                last_i = result.pop()
+                c = last_i[0]
+                r = last_i[1] + 1
+                board[last_i[1]][last_i[0]] = 0
+                continue
+            c += 1
+
+        if len(result):
+            print(result)
+            i = result[0][1]
+            last_i = result.pop()
+            c = last_i[0]
+            r = last_i[1] + 1
+            board[last_i[1]][last_i[0]] = 0
+        else:
+            return
+
 
 if __name__ == "__main__":
-    # execute only if run as a script
     main()
